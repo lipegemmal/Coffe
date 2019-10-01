@@ -36,6 +36,7 @@ tokens = [
     #Simbolos lógicos
     'MENOR',   # <
     'MAIOR',   # >
+    'IGUALIGUAL', #==
     'IGUAL',   # =
    # 'E',       # e
    # 'OU',      # ou
@@ -54,11 +55,10 @@ tokens = [
 #    'ASPASDUPLAS',      # "
     'PONTOEVIRGULA',    # ;
 
-    #Número
-    'NUMBER',
+    
     'CARCONST',
     'INTCONST',
-    'CADEIADECARACTERES',
+    'CADEIACARACTERES',
 
     #Variavel + palavras reservadas da lista (faço a checagem)
     'ID',
@@ -95,6 +95,7 @@ t_PERCENTUAL = '\%'
 #Simbolos lógicos
 t_MENOR = '\<'
 t_MAIOR = '\>'
+t_IGUALIGUAL = '\=\='
 t_IGUAL = '\='
 t_EXCLAMACAO = '\!'
 t_INTERROGACAO = '\?'
@@ -115,23 +116,19 @@ def t_BARRAN(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
 
-def t_NUMBER(t):
-    r'[0-9]'
-    t.value = int(t.value)
-    return t
-
-
+#car não pode ser "
 def t_CARCONST(t):
-    r' \"[a-zA-Z]\" '
+    r' \"[^"]\" '
     t.value = t.value[1:-1]
     return t
 
 def t_INTCONST(t):
-    r'[0-9]+'
+    r'[0-9][0-9]*'
     t.value = int(t.value)
     return t
 
-def t_CADEIADECARACTERES(t):
+#cadeia não aceita " dentro 
+def t_CADEIACARACTERES(t):
     r' \"[^"]+\" '
     t.value = t.value[1:-1]
     if t.value.find('\n') != -1:
@@ -158,12 +155,14 @@ t_ignore = ' \t\r'
 
 lexer = lex.lex()
 
-lex.input(open("test.txt", "r").read())
 
-while True:
-        tok = lexer.token()
-        if not tok:
-            break
-        print(tok)
-        
+#if __name__ == __main__:
+#    lex.input(open("test.txt", "r").read())
+#    while True:
+#        tok = lexer.token()
+#        
+#        if not tok:
+#            break
+#        print(tok)
+
 
