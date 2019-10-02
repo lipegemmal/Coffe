@@ -346,7 +346,10 @@ def p_listexpr(p):
     #if len(p) == 4:
     #    p[0] = p[1] + p[2] + p[3]
 
-
+def p_error(p):
+    print("ERRO, token " + p.type + " na linha " + str(p.lineno))
+    #print (p.__dict__.keys())
+    exit
 
 parser = yacc.yacc()
 
@@ -354,4 +357,5 @@ parser = yacc.yacc()
 
 s = open("test.txt","r").read()
 
-parser.parse(s, tracking=True)
+#parser.parse(s, tracking=True)
+parser.parse(s)
