@@ -347,7 +347,7 @@ def p_listexpr(p):
     #    p[0] = p[1] + p[2] + p[3]
 
 def p_error(p):
-    print("ERRO, token " + p.type + " na linha " + str(p.lineno))
+    print("ERRO, token " + p.type + " nao esperado na linha " + str(p.lineno))
     #print (p.__dict__.keys())
     exit
 

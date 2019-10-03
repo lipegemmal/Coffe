@@ -67,13 +67,14 @@ tokens = [
     'BARRAN',    # \n
 
     #Comentário
-    'COMENTARIO'
+    'COMENTARIOMULTILINHA',
+    'COMENTARIOUMALINHA'
 ] + list(reserved.values())
 
 ###Expressões regulares###
 
 
-def t_COMENTARIO(t):
+def t_COMENTARIOMULTILIHA(t):
     r'/\*[^(\*/)]*(\*/)?'
 
     
@@ -83,6 +84,11 @@ def t_COMENTARIO(t):
     
     t.lexer.lineno += t.value.count('\n')
 
+    pass
+
+def t_COMENTARIOUMALINHA(t):
+    r'// .*  '
+    t.lexer.lineno += 1
     pass
 
 #Simbolos matematicos
@@ -118,7 +124,7 @@ def t_BARRAN(t):
 
 #car não pode ser "
 def t_CARCONST(t):
-    r' \"[^"]\" '
+    r' \'[^\']\' '
     t.value = t.value[1:-1]
     return t
 
@@ -157,12 +163,11 @@ lexer = lex.lex()
 
 
 #if __name__ == __main__:
-#    lex.input(open("test.txt", "r").read())
-#    while True:
-#        tok = lexer.token()
-#        
-#        if not tok:
-#            break
-#        print(tok)
+lex.input(open("test.txt", "r").read())
+while True:
+    tok = lexer.token()   
+    if not tok:
+        break
+    print(tok)
 
 
