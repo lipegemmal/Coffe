@@ -162,12 +162,21 @@ t_ignore = ' \t\r'
 lexer = lex.lex()
 
 
-#if __name__ == __main__:
-lex.input(open("test.txt", "r").read())
-while True:
-    tok = lexer.token()   
-    if not tok:
-        break
-    print(tok)
+if __name__ == "__main__":
+    print("Digite o nome do arquivo de entrada (com o tipo dele):")
+    pasta = "arquivos/"
+    entrada = input()
+
+    #print(pasta+entrada)
+    
+    arquivo = open(pasta + str(entrada) ,"r").read()
+    lex.input(arquivo)
+    
+    while True:
+        tok = lexer.token()   
+        if not tok:
+            break
+        print(" Token:\"" + str(tok.value) + "\" Lineno:"+ str(tok.lineno))
+
 
 

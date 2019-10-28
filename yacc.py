@@ -1,11 +1,10 @@
 from ply import yacc
-
 #importing lexer object
 from lexer import lexer
 #import tokens table
 from lexer import tokens
-
-
+#Classes file
+import classes as objects
 
 ##
 ##  REANALIZAR A CADEIA DE CARACTERES!!!
@@ -14,8 +13,8 @@ from lexer import tokens
 def p_programa(p):
     "programa : declfuncvar declprog"
 
-    #print("Sai")
-    #p[0] = p[1] + p[2]
+    #if isinstance(lista['x'],objects.Variable):
+     
 
 def p_declfuncvar(p):
     """
@@ -25,15 +24,53 @@ def p_declfuncvar(p):
     declfuncvar : 
     """
 
-    #print("declfuncvar")
-    #if len(p) == 6:
-    #    p[0] = p[1] + p[2] + p[3] + p[4] + p[5] 
-    #if len(p) == 9:
-    #    p[0] = p[1] + p[2] + p[3] + p[4] + p[5] + p[6] + p[7] + p[9]
-    #if len(p) == 4:
-    #    p[0] = p[1] + p[2] + p[3] 
-    #if len(p) == 1:
-    #    p[0] = []
+    
+    #PARA AS DECLARAÇÕES DE VARIAVEL GLOBAL
+    if len(p) > 5:
+        variableList = {}
+        Repetido = False
+        x = None
+        #Se é um vetor
+        if p[3] == "[":
+            x = objects.Variable(vector=True, vectorSize=p[4])
+            #pegando recursão
+            if p[8] != None:
+                variableList = p[8]
+            #pegando valor de declvar
+            if p[6] != None:
+                auxList = p[6]
+                for aux in auxList:
+                    auxList[aux].setTipo(str(p[1]))
+                    if aux in variableList:
+                        Repetido = True
+                        break
+                variableList.update(auxList)
+
+        #Se é uma variavel
+        else:
+            x = objects.Variable()
+            #pegando recursão
+            if p[5] != None:
+                variableList = p[5]
+            #pegando valor de declvar
+            if p[3] != None:
+                auxList = p[3]
+                for aux in auxList:
+                    auxList[aux].setTipo(str(p[1]))
+                    if aux in variableList:
+                        Repetido = True
+                        break
+                variableList.update(auxList)
+
+        #print(p[2])
+        if p[2] in variableList or Repetido == True:
+            print("Erro na linha "+str(p.lineno) +
+                  ":variavel "+ "já foi declarada")
+            exit()
+        else:
+            variableList[str(p[2])] = x
+        p[0] = variableList
+
 
 def p_declprog(p):
     'declprog : PROGRAMA bloco'
@@ -47,6 +84,31 @@ def p_declvar(p):
     declvar :
     """
 
+    #print("declvar")
+    variableList = {}
+    if len(p) > 1:
+        x = None
+        #Se é um vetor
+        if p[3] == "[":
+            x = objects.Variable(vector=True, vectorSize=p[4])
+            if p[6] != None:
+                variableList = p[6]
+        #Se é uma variavel
+        else:
+            x = objects.Variable()
+            if p[3] != None:
+                variableList = p[3]
+
+        print(p[2])
+        if  p[2] in variableList:
+            print("Erro na linha "+str(p.lineno)+ ":variavel " + "já foi declarada")
+            exit()
+        else:
+            variableList[str(p[2])] = x
+        
+        p[0] = variableList
+
+            
     #print("declvar")
     #if len(p) == 4:
     #    p[0] = p[1] + p[2] + p[3]
@@ -104,27 +166,65 @@ def p_bloco(p):
 
 def p_listadeclvar(p):
     """
-    listadeclvar : 
     listadeclvar : tipo ID declvar PONTOEVIRGULA listadeclvar
     listadeclvar : tipo ID ABRECOLCHETES INTCONST FECHACOLCHETES declvar PONTOEVIRGULA listadeclvar
+    listadeclvar : 
     """
 
-    #print("listadeclvar")
-    #if len(p) == 1:
-    #    p[0] = []
-    #if len(p) == 6:
-    #    p[0] = p[1] + p[2] + p[3] + p[4] + p[5]
+    #print("listadeclvar de tamanho " + str(len(p)))
+    variableList = {}
+    Repetido = False
+    #Se não é vazio
+    if len(p) > 1:
+        #Se é uma variavel comum
+        if p[4] == ';':
+            x = objects.Variable(p[1])
+            #pegando recursão
+            if p[5] != None:
+                variableList = p[5]
+            #pegando declvar
+            if p[3] != None:
+                auxList = p[3]
+                for aux in auxList:
+                    auxList[aux].setTipo(str(p[1]))
+                    if aux in variableList:
+                        Repetido = True
+                        break
+                variableList.update(auxList)
+      #      print(p[3])
+        #Se é um vetor
+        else:
+            x = objects.Variable(p[1],True,p[4])
+            #pegando recursão
+            if p[8] != None:
+                variableList = p[8]
+            #pegando declvar
+            if p[6] != None:
+                auxList = p[6]
+                for aux in auxList:
+                    auxList[aux].setTipo(str(p[1]))
+                    if aux in variableList:
+                        Repetido = True
+                        break
+                variableList.update(auxList)
+
+        if p[2] in variableList or Repetido == True:
+            print("Erro na linha "+str(p.lineno)+":variavel " + "já foi declarada")
+            exit()
+        else:
+            variableList[str(p[2])] = x
+            
+       
+    p[0] = variableList
 
 def p_tipo(p):
     """
     tipo : INT
     tipo : CAR
     """
-    
-    #print("tipo")
-    #duas regras com mesmo tamanho
-    #if len(p) == 2:
-    #    p[0] = p[1]
+    #subindo tipo para declarar uma variavel
+    p[0] = p[1]
+
 
 def p_listacomando(p):
     """
@@ -308,6 +408,7 @@ def p_lvalueexpr(p):
     """
 
     #print("lvalueexpr")
+    
     #if len(p) == 5:
     #    p[0] = p[1] + p[2] + p[3] + p[4]
     #if len(p) == 2:
@@ -324,7 +425,6 @@ def p_primexpr(p):
     primexpr : ABREPARENTESES expr FECHAPARENTESES
     """
 
-    #print("primexpr")
     #expressoes com mesmo tamanho
 
     #if len(p) == 5:
@@ -349,13 +449,20 @@ def p_listexpr(p):
 def p_error(p):
     print("ERRO, token " + p.type + " nao esperado na linha " + str(p.lineno))
     #print (p.__dict__.keys())
-    exit
+    exit()
+
+
+print("Digite o nome do arquivo de entrada (com o tipo dele):")
+
+pasta = "arquivos/"
+entrada = input()   
+arquivo = open(pasta + str(entrada) ,"r").read()
 
 parser = yacc.yacc()
 
 #yacc.parse(open("test.txt","r"))
 
-s = open("test.txt","r").read()
-
 #parser.parse(s, tracking=True)
-parser.parse(s)
+parser.parse(arquivo)
+
+print("Nenhum erro encontrado")
