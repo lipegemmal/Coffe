@@ -9,11 +9,13 @@ import classes as objects
 ##
 ##  REANALIZAR A CADEIA DE CARACTERES!!!
 ##  VERIFICAR NUMBER, CONSTINT, CARCONST E ASPASDUPLAS , CADEIADECARACTERES
+## O ESPAÇO DE SIMBOLOS PARA FUNÇÕES E VARIAVEIS É O MESMO!!!
 
 def p_programa(p):
     "programa : declfuncvar declprog"
-
-    print(p[1])
+    #FAZER UPDATE DE DECLFUNCVAR COM A FUNÇÃO MAIN DE DECLPROG
+    raiz = p[1]
+    raiz.update(p[2])
     #if isinstance(lista['x'],objects.Variable):
      
 
@@ -24,13 +26,12 @@ def p_declfuncvar(p):
     declfuncvar : tipo ID declfunc declfuncvar
     declfuncvar : 
     """
-
+    variableList = {}
+    Repetido = False
+    x = None
     
     #PARA AS DECLARAÇÕES DE VARIAVEL GLOBAL
     if len(p) > 5:
-        variableList = {}
-        Repetido = False
-        x = None
         #Se é um vetor
         if p[3] == "[":
             x = objects.Variable(vector=True, vectorSize=p[4])
@@ -63,24 +64,37 @@ def p_declfuncvar(p):
                         break
                 variableList.update(auxList)
 
-        #print(p[2])
-        if p[2] in variableList or Repetido == True:
-            print("Erro na linha "+str(p.lineno(2)) +
-                  ":variavel "+ "já foi declarada")
-            exit()
-        else:
-            variableList[str(p[2])] = x
-        p[0] = variableList
-        aux = objects.createScope(variableList,None)
+    #Se é uma declaração de função
+    #declfuncvar : tipo ID declfunc declfuncvar
+    elif len(p) == 5:
+        #Pegando a recursao
+        variableList = p[4]
+        x = p[3]
+        x.setTipo(p[1])
+        variableList[p[2]] = x
 
-        #print(objects.escopo)
-
+    #Finalmente, se não tem nenhuma repetição, posso colocar a nova variavel ( ou funcao) no dicionario
+    if p[2] in variableList or Repetido == True:
+        print("Erro na linha "+str(p.lineno(2)) +":variavel " + "já foi declarada")
+        exit()
+    else:
+        variableList[str(p[2])] = x
+    
+    p[0] = variableList
+    aux = objects.createScope(variableList, None)
 
 def p_declprog(p):
     'declprog : PROGRAMA bloco'
     #Aqui é o escopo "main"
-
-
+    #Criar uma função main e colocar na tabela
+    
+    dicionario = {}
+    #dicionario vazio para "variaveis de chamada" da funcao "main"
+    variaveisDaFuncao = {}
+    x = objects.Funcao(variaveisDaFuncao,arvoreBloco=p[2])
+    x.setTipo("int")
+    dicionario["Main"] = x
+    p[0] = x
 
 def p_declvar(p):
     """
@@ -88,7 +102,7 @@ def p_declvar(p):
     declvar : VIRGULA ID ABRECOLCHETES INTCONST FECHACOLCHETES declvar
     declvar :
     """
-
+    #REVISAR!!!!!!!#######################
     #print("declvar")
     variableList = {}
     if len(p) > 1:
@@ -116,9 +130,9 @@ def p_declvar(p):
 def p_declfunc(p):
     'declfunc : ABREPARENTESES listaparametros FECHAPARENTESES bloco'
 
-   # print("blocoDeclFunc")
-    #print("declfunc")
-    #p[0] = p[1] + p[2] + p[3] + p[4]
+    #Criando a base da classe funcao (ainda não colocamos ela no dicionario de variaveis e nem damos nome)
+    x = objects.Funcao(p[2],p[4])
+    p[0] = x
 
 def p_listaparametros(p):
     """
@@ -126,11 +140,12 @@ def p_listaparametros(p):
     listaparametros : listaparametroscont
     """
 
-    #print("listaparametros")
-    #if len(p) == 1:
-    #    p[0] = []
-    #if len(p) == 2:
-    #    p[0] = p[1]
+    x = None
+    #Se de fato tem uma lista
+    if len(p) == 2:
+        x = p[1]
+    p[0] = x
+
 
 def p_listaparametroscont(p):
     """
@@ -139,15 +154,48 @@ def p_listaparametroscont(p):
     listaparametroscont : tipo ID VIRGULA listaparametroscont
     listaparametroscont : tipo ID ABRECOLCHETES FECHACOLCHETES VIRGULA listaparametroscont
     """
+    #Montarei um dicionario com as variaveis de entrada, mesma estrutura das variaveis declaradas
 
-    #print("listaparametroscont")
-    #if len(p) == 3:
-    #    p[0] = p[1] + p[2]
-    #note que existem duas regras com o mesmo len
-    #if len(p) == 5:
-    #    p[0] = p[1] + p[2] + p[3] + p[4]
-    #if len(p) == 7:
-    #    p[0] = p[1] + p[2] + p[3] + p[4] + p[5] + p[6]
+    variableList = {}
+    Repetido = False
+    x = None
+
+    #Se é apenas um ID SEM uma lista prévia
+    if len(p) == 3:
+        x = objects.Variable(p[1])
+    
+    #Se é um vetor SEM uma lista prévia OU um ID COM uma lista prévie
+    elif len(p) == 4:
+        #Se é um vetor
+        if p[3] == "[":
+            x = objects.Variable(p[1],vector = True)
+        #Se é um ID Com lista previa
+        else:
+            x = objects.Variable(p[1])
+            #Aqui é preciso pegar a recursão e verificar por nomes repetidos
+            variableList = p[4]
+            if variableList != None:
+                if p[2] in variableList:
+                    Repetido = True
+    #Finalmente, se é um vetor COM lista prévia
+    elif len(p) == 7:
+        x = objects.Variable(p[1],vector= True)
+        #Aqui se pega a recusão e verifica por nomes repetidos
+        variableList = p[6]
+        if variableList != None:
+            if p[2] in variableList:
+                Repetido = True
+
+    #Se ocorreu alguma repetição de nome de variavel
+    if Repetido == True:
+        print("Erro na linha "+str((p.lineno(2)))+":variaveis com nome igual na funcao")
+        exit()
+        
+    #Se não ocorreu nenhuma repetição
+    else:
+        variableList[p[2]] = x
+    #Subo o dicionario
+    p[0] = variableList
 
 def p_bloco(p):
     """
@@ -157,13 +205,15 @@ def p_bloco(p):
     
     #SUBIR P[2] ṔARA DETERMINAR O PAI
     
-
-
-    #print("bloco")
-    #if len(p) == 5:
-    #    p[0] = p[1] + p[2] + p[3] + p[4]
-    #if len(p) == 4:
-    #    p[0] = p[1] + p[2] + p[3]
+    x = None
+    #Se o bloco CONTER listacomando
+    if len(p) == 5:
+        x = objects.Bloco(p[2],p[3])
+    #Se o bloco NÃO CONTER listacomando
+    else:
+        x = objects.Bloco(p[2])
+    
+    p[0] = x
 
 def p_listadeclvar(p):
     """
@@ -175,6 +225,7 @@ def p_listadeclvar(p):
     #print("listadeclvar de tamanho " + str(len(p)))
     variableList = {}
     Repetido = False
+    x = None
     #Se não é vazio
     if len(p) > 1:
         #Se é uma variavel comum
@@ -214,8 +265,10 @@ def p_listadeclvar(p):
             exit()
         else:
             variableList[str(p[2])] = x
-            
-       
+
+    #Se é vazio, não fazer nada e a lista vai subir "vazia"
+    else:
+       pass
     p[0] = variableList
 
 def p_tipo(p):
@@ -233,45 +286,82 @@ def p_listacomando(p):
     listacomando : comando listacomando
     """
 
-    #print("listacomando")
-    #if len(p) == 2:
-    #    p[0] = p[1]
-    #if len(p) == 3:
-    #    p[0] = p[1] + p[2]
+    x = None
+    #Se é a regra SEM a listacomando
+    if len(p) == 2:
+        x = objects.ListComando(p[1])
+    #Se é a regra COM a listacomando
+    else:
+        x = objects.ListComando(p[1],p[2])
 
-def p_comando(p):
+    p[0] = x
+
+def p_comando1(p):
     """
-    comando : PONTOEVIRGULA
-    comando : expr PONTOEVIRGULA
-    comando : RETORNE expr PONTOEVIRGULA
-    comando : LEIA lvalueexpr PONTOEVIRGULA    
-    comando : ESCREVA expr PONTOEVIRGULA
-    comando : ESCREVA CADEIACARACTERES PONTOEVIRGULA
-    comando : NOVALINHA PONTOEVIRGULA
+    comando : PONTOEVIRGULA    
+    comando : expr PONTOEVIRGULA  
+    comando : RETORNE expr PONTOEVIRGULA  
+    comando : LEIA lvalueexpr PONTOEVIRGULA     
+    comando : ESCREVA expr PONTOEVIRGULA 
+    comando : NOVALINHA PONTOEVIRGULA 
     comando : SE ABREPARENTESES expr FECHAPARENTESES ENTAO comando
     comando : SE ABREPARENTESES expr FECHAPARENTESES ENTAO comando SENAO comando
     comando : ENQUANTO ABREPARENTESES expr FECHAPARENTESES EXECUTE comando
     comando : bloco
     """ 
+    #O objeto criado foi numerado de 1-10 dependendo da linha da gramática correspondente
 
+    x = None
+    #Pode ser expressão sem nada ou novalinha (2,6)
+    if len(p) == 2:
+        #Se for novalinha (6)
+        if p[1] == "novalinha":
+            x = objects.NovaLinha()
+        #Se for expressao sem nada (2), vou apenas subir a expressao
+        else:
+            x = p[1]
+    #Pode ser função retone,leia ou escreva (3,4,5)
+    elif len(p) == 3:
+        #Se for retone
+        if p[1] == "retorne":
+            x = objects.Retorne(p[2])
+        #Se for leia
+        elif p[1] == "leia":
+            x = objects.Leia(p[2])
+        #Se for escreva
+        elif p[1] == "escreva":
+            x = objects.Escreva(p[2],isExpressao=True)
+    #Se for uma expressão de Se (7,8)
+    elif p[1] == "se":
+        #Se tiver não tiver o senão (7)
+        if len(p) == 7:
+            x = objects.Se(p[3],p[6])
+        #Se tiver o senão (8)
+        else:
+            x = objects.Se(p[3],p[6],senao=True,comandosenao=p[8])
+    
+    #Se for uma expressão de Enquanto (9)
+    elif p[1] == "enquanto":
+        x = objects.Enquanto(p[3],p[6])
 
-    #p[0] = objects.Enquanto(expr,comando)
+    #Se for apenas um ; sem mais nada, x continua como None (1)
+    elif p[1] == ";":
+        x = None
+    #Se caiu aqui é porque é um bloco, então eu apenas subo (10)
+    else:
+        x = p[1]
+        
+    p[0] = x
 
-    #print("blocoComando")
-    #print("comando")
-    #varios comandos com mesmos tamanhos
-    #if len(p) == 2:
-    #    p[0] = p[1]
-    #if len(p) == 3:
-    #    p[0] = p[1] + p[2]
-    #if len(p) == 4:
-    #    p[0] = p[1] + p[2] + p[3]
-    #if len(p) == 6:
-    #    p[0] = p[1] + p[2] + p[3] + p[4] + p[5]
-    #if len(p) == 7:
-    #    p[0] = p[1] + p[2] + p[3] + p[4] + p[5] + p[6]
+def p_comando2(p):
+    """
+    comando : ESCREVA CADEIACARACTERES PONTOEVIRGULA
+    """
+    #Comando separado pois não consigo diferenciar "cadeiacaracteres" e "expr" pelo conteúdo com muita precisão
+    x = objects.Escreva(p[2],isCadeiaDeCaracteres=True)
 
-
+    p[0] = x
+    
 def p_expr(p):
     'expr : assignexpr'
 
@@ -441,13 +531,20 @@ def p_unexpr(p):
     unexpr : EXCLAMACAO primexpr
     unexpr : primexpr
     """
-    #print("unexpr")
-    #expressoes com mesmo tamanho
+    x = None
+    #Se devo criar a classe
+    if len(p) == 3:
+        #Se é uma operação de menos
+        if p[1] == "-":
+            x = objects.UnaryExpr(isMenos=True)
+        #Se é a negação de uma operação (!)
+        elif p[1] == "!":
+            x = objects.UnaryExpr(isNegativo=True)
+    #Se só devo subir a operação
+    else:
+        x = p[1]
 
-    #if len(p) == 3:
-    #    p[0] = p[1] + p[2]
-    #if len(p) == 2:
-    #    p[0] = p[1]
+    p[0] = x
 
 def p_lvalueexpr(p):
     """
@@ -472,8 +569,6 @@ def p_primexpr1(p):
     primexpr : ID
     primexpr : ABREPARENTESES expr FECHAPARENTESES
     """
-    #expressoes com mesmo tamanho
-
     x = None
 
     #Pode ser chamada de função ou uma posição de vetor

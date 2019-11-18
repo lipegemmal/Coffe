@@ -24,6 +24,14 @@ class Variable(object):
             #else:
                 #RETORNAR ERRO DE ACESSO EM POSIÇÃO QUE NÃO PODE!!!!
 
+class Funcao(object):
+    def __init__(self,dictVariable,arvoreBloco):
+        self.dictVariable = dictVariable
+        self.arvoreBloco = arvoreBloco
+
+    def setTipo(self,tipo):
+        self.tipo = tipo
+
 #Não lembro oq é kkk######################
 class BinaryOperation(object):
     def __init__(self,operation,left,right):
@@ -129,19 +137,63 @@ class Primexpr(object):
         self.isInt = isInt
         #Talvez seja interessante fazer algumas verificações para garantir que tudo foi colocado certinho nesse objeto
 
+class UnaryExpr(object):
+    def __init__(self,isNegativo=False,isMenos=False):
+        self.isNegativo = isNegativo
+        self.isMenos = isMenos
 
+        if(isMenos == False and isNegativo == False):
+            print("Classe unária sem operacao")
+            exit()
+
+class ListComando(object):
+    def __init__(self,arvoreComando , arvoreListaComando = None):
+        self.arvoreComando = arvoreComando #Objeto comando
+        self.arvoreListaComando = arvoreListaComando #outro objeto ListComando ou None 
+        
+
+########Classes da gramática COMANDO############################
 class Se(object):
     def __init__(self,expressao,comando,senao=False,comandosenao = None):
         self.expressao = expressao
         self.comando = comando
         self.senao = senao
-        if(senao != False):
-            self.comandosenao = comandosenao
+        self.comandosenao = comandosenao
         
 class Enquanto(object):
     def __init__(self,expressao,comando):
         self.expressao = expressao
         self.comando = comando
+
+class Leia(object):
+    def __init__ (self,arvoreLvalue):
+        self.arvoreLvalue = arvoreLvalue
+
+class Escreva(object):
+    #NÃO ESQUECER DE VERIFICAR O CASO DA EXPRESSAO OU CADEIA PASSADA SEREM VAZIAS!!
+    def __init__ (self,value = None,isExpressao = False, isCadeiaDeCaracteres = False):
+        self.value = value #Valor passado para a função escrever
+        self.isExpressao = isExpressao #Caso seja uma árvore de expressão
+        self.isCadeiaDeCaracteres = isCadeiaDeCaracteres #Caso seja uma cadeia de Caracteres
+        if isCadeiaDeCaracteres != None and isExpressao != None:
+            print("Operacao de escrever com entrada ambigua")
+            exit()
+    
+#Criando um objeto sem variaveis kkk
+class NovaLinha(object):
+    def __init__ (self):
+        pass
+
+class Retorne(object):
+    def __init__(self,expressao):
+        self.expressao = expressao
+
+################################################
+
+class Bloco(object):
+    def __init__ (self,dictVar,arvoreListaComando = None):
+        self.dictVar = dictVar
+        self.arvoreListaComando = arvoreListaComando
 
 #classe do escopo de variáveis
 #Para determinar os pais , manter uma lista com o objeto dos filhos subindo e depois quando encontrar o pai, setar o pai nos filhos e limpar a lista
