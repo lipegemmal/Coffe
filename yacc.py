@@ -17,7 +17,7 @@ def p_programa(p):
     raiz = p[1]
     raiz.update(p[2])
     #if isinstance(lista['x'],objects.Variable):
-     
+    print(raiz) 
 
 def p_declfuncvar(p):
     """
@@ -63,6 +63,10 @@ def p_declfuncvar(p):
                         Repetido = True
                         break
                 variableList.update(auxList)
+        #Se tem alguma repetição de variavel
+        if p[2] in variableList or Repetido == True:
+            print("Erro na linha "+str(p.lineno(2)) +  ":variavel " + "já foi declarada")
+            exit()
 
     #Se é uma declaração de função
     #declfuncvar : tipo ID declfunc declfuncvar
@@ -74,11 +78,6 @@ def p_declfuncvar(p):
         variableList[p[2]] = x
 
     #Finalmente, se não tem nenhuma repetição, posso colocar a nova variavel ( ou funcao) no dicionario
-    if p[2] in variableList or Repetido == True:
-        print("Erro na linha "+str(p.lineno(2)) +":variavel " + "já foi declarada")
-        exit()
-    else:
-        variableList[str(p[2])] = x
     
     p[0] = variableList
     aux = objects.createScope(variableList, None)
@@ -94,7 +93,7 @@ def p_declprog(p):
     x = objects.Funcao(variaveisDaFuncao,arvoreBloco=p[2])
     x.setTipo("int")
     dicionario["Main"] = x
-    p[0] = x
+    p[0] = dicionario
 
 def p_declvar(p):
     """

@@ -175,7 +175,7 @@ class Escreva(object):
         self.value = value #Valor passado para a função escrever
         self.isExpressao = isExpressao #Caso seja uma árvore de expressão
         self.isCadeiaDeCaracteres = isCadeiaDeCaracteres #Caso seja uma cadeia de Caracteres
-        if isCadeiaDeCaracteres != None and isExpressao != None:
+        if isCadeiaDeCaracteres != False and isExpressao != False:
             print("Operacao de escrever com entrada ambigua")
             exit()
     
