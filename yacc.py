@@ -17,7 +17,8 @@ def p_programa(p):
     raiz = p[1]
     raiz.update(p[2])
     #if isinstance(lista['x'],objects.Variable):
-    print(raiz) 
+    p[0] = raiz
+    #print(raiz["fatorial"]) 
 
 def p_declfuncvar(p):
     """
@@ -34,7 +35,7 @@ def p_declfuncvar(p):
     if len(p) > 5:
         #Se é um vetor
         if p[3] == "[":
-            x = objects.Variable(vector=True, vectorSize=p[4])
+            x = objects.Variable(p.lineno(2),p[1],vector=True, vectorSize=p[4])
             #pegando recursão
             if p[8] != None:
                 variableList = p[8]
@@ -50,7 +51,7 @@ def p_declfuncvar(p):
 
         #Se é uma variavel
         else:
-            x = objects.Variable()
+            x = objects.Variable(p.lineno(2), p[1])
             #pegando recursão
             if p[5] != None:
                 variableList = p[5]
@@ -67,6 +68,9 @@ def p_declfuncvar(p):
         if p[2] in variableList or Repetido == True:
             print("Erro na linha "+str(p.lineno(2)) +  ":variavel " + "já foi declarada")
             exit()
+        else:
+            variableList[str(p[2])] = x
+       
 
     #Se é uma declaração de função
     #declfuncvar : tipo ID declfunc declfuncvar
@@ -75,13 +79,16 @@ def p_declfuncvar(p):
         variableList = p[4]
         x = p[3]
         x.setTipo(p[1])
-        variableList[p[2]] = x
+        if p[2] in variableList:
+            print("Erro na linha "+str(p.lineno(2)) +  ":funcao " + "já foi declarada")
+        else:
+            variableList[str(p[2])] = x
 
     #Finalmente, se não tem nenhuma repetição, posso colocar a nova variavel ( ou funcao) no dicionario
     
     p[0] = variableList
-    aux = objects.createScope(variableList, None)
-
+    #print(variableList)
+    
 def p_declprog(p):
     'declprog : PROGRAMA bloco'
     #Aqui é o escopo "main"
@@ -89,8 +96,7 @@ def p_declprog(p):
     
     dicionario = {}
     #dicionario vazio para "variaveis de chamada" da funcao "main"
-    variaveisDaFuncao = {}
-    x = objects.Funcao(variaveisDaFuncao,arvoreBloco=p[2])
+    x = objects.Funcao(p.lineno(1),None, arvoreBloco=p[2])
     x.setTipo("int")
     dicionario["Main"] = x
     p[0] = dicionario
@@ -108,12 +114,12 @@ def p_declvar(p):
         x = None
         #Se é um vetor
         if p[3] == "[":
-            x = objects.Variable(vector=True, vectorSize=p[4])
+            x = objects.Variable(p.lineno(2),vector=True, vectorSize=p[4])
             if p[6] != None:
                 variableList = p[6]
         #Se é uma variavel
         else:
-            x = objects.Variable()
+            x = objects.Variable(p.lineno(2))
             if p[3] != None:
                 variableList = p[3]
 
@@ -130,7 +136,7 @@ def p_declfunc(p):
     'declfunc : ABREPARENTESES listaparametros FECHAPARENTESES bloco'
 
     #Criando a base da classe funcao (ainda não colocamos ela no dicionario de variaveis e nem damos nome)
-    x = objects.Funcao(p[2],p[4])
+    x = objects.Funcao(p.lineno(1), p[2], p[4])
     p[0] = x
 
 def p_listaparametros(p):
@@ -161,16 +167,16 @@ def p_listaparametroscont(p):
 
     #Se é apenas um ID SEM uma lista prévia
     if len(p) == 3:
-        x = objects.Variable(p[1])
+        x = objects.Variable(p.lineno(2), p[1])
     
     #Se é um vetor SEM uma lista prévia OU um ID COM uma lista prévie
     elif len(p) == 4:
         #Se é um vetor
         if p[3] == "[":
-            x = objects.Variable(p[1],vector = True)
+            x = objects.Variable(p.lineno(2),p[1],vector = True)
         #Se é um ID Com lista previa
         else:
-            x = objects.Variable(p[1])
+            x = objects.Variable(p.lineno(2),p[1])
             #Aqui é preciso pegar a recursão e verificar por nomes repetidos
             variableList = p[4]
             if variableList != None:
@@ -178,7 +184,7 @@ def p_listaparametroscont(p):
                     Repetido = True
     #Finalmente, se é um vetor COM lista prévia
     elif len(p) == 7:
-        x = objects.Variable(p[1],vector= True)
+        x = objects.Variable(p.lineno(2), p[1], vector=True)
         #Aqui se pega a recusão e verifica por nomes repetidos
         variableList = p[6]
         if variableList != None:
@@ -203,14 +209,13 @@ def p_bloco(p):
     """
     
     #SUBIR P[2] ṔARA DETERMINAR O PAI
-    
     x = None
     #Se o bloco CONTER listacomando
     if len(p) == 5:
-        x = objects.Bloco(p[2],p[3])
+        x = objects.Bloco(p.lineno(1),p[2],p[3])
     #Se o bloco NÃO CONTER listacomando
     else:
-        x = objects.Bloco(p[2])
+        x = objects.Bloco(p.lineno(1),p[2])
     
     p[0] = x
 
@@ -229,7 +234,7 @@ def p_listadeclvar(p):
     if len(p) > 1:
         #Se é uma variavel comum
         if p[4] == ';':
-            x = objects.Variable(p[1])
+            x = objects.Variable(p.lineno(2), p[1])
             #pegando recursão
             if p[5] != None:
                 variableList = p[5]
@@ -245,7 +250,7 @@ def p_listadeclvar(p):
       #print(p[3])
         #Se é um vetor
         else:
-            x = objects.Variable(p[1],True,p[4])
+            x = objects.Variable(p.lineno(2),p[1],True,p[4])
             #pegando recursão
             if p[8] != None:
                 variableList = p[8]
@@ -288,10 +293,10 @@ def p_listacomando(p):
     x = None
     #Se é a regra SEM a listacomando
     if len(p) == 2:
-        x = objects.ListComando(p[1])
+        x = objects.ListComando(p.lineno(1),p[1])
     #Se é a regra COM a listacomando
     else:
-        x = objects.ListComando(p[1],p[2])
+        x = objects.ListComando(p.lineno(1),p[1],p[2])
 
     p[0] = x
 
@@ -312,7 +317,7 @@ def p_comando1(p):
 
     x = None
     #Pode ser expressão sem nada ou novalinha (2,6)
-    if len(p) == 2:
+    if len(p) == 3:
         #Se for novalinha (6)
         if p[1] == "novalinha":
             x = objects.NovaLinha()
@@ -320,28 +325,28 @@ def p_comando1(p):
         else:
             x = p[1]
     #Pode ser função retone,leia ou escreva (3,4,5)
-    elif len(p) == 3:
+    elif len(p) == 4:
         #Se for retone
         if p[1] == "retorne":
-            x = objects.Retorne(p[2])
+            x = objects.Retorne(p.lineno(1),p[2])
         #Se for leia
         elif p[1] == "leia":
-            x = objects.Leia(p[2])
+            x = objects.Leia(p.lineno(1), p[2])
         #Se for escreva
         elif p[1] == "escreva":
-            x = objects.Escreva(p[2],isExpressao=True)
+            x = objects.Escreva(p.lineno(1),p[2],isExpressao=True)
     #Se for uma expressão de Se (7,8)
     elif p[1] == "se":
         #Se tiver não tiver o senão (7)
         if len(p) == 7:
-            x = objects.Se(p[3],p[6])
+            x = objects.Se(p.lineno(1),p[3], p[6])
         #Se tiver o senão (8)
         else:
-            x = objects.Se(p[3],p[6],senao=True,comandosenao=p[8])
+            x = objects.Se(p.lineno(1),p[3],p[6],senao=True,comandosenao=p[8])
     
     #Se for uma expressão de Enquanto (9)
     elif p[1] == "enquanto":
-        x = objects.Enquanto(p[3],p[6])
+        x = objects.Enquanto(p.lineno(1),p[3],p[6])
 
     #Se for apenas um ; sem mais nada, x continua como None (1)
     elif p[1] == ";":
@@ -357,7 +362,7 @@ def p_comando2(p):
     comando : ESCREVA CADEIACARACTERES PONTOEVIRGULA
     """
     #Comando separado pois não consigo diferenciar "cadeiacaracteres" e "expr" pelo conteúdo com muita precisão
-    x = objects.Escreva(p[2],isCadeiaDeCaracteres=True)
+    x = objects.Escreva(p.lineno(1),p[2],isCadeiaDeCaracteres=True)
 
     p[0] = x
     
@@ -377,7 +382,7 @@ def p_assignexpr(p):
     x = None
     #Se é uma atribuicao com =
     if len(p) == 4:
-        x = objects.Atribuicao(p[1],p[3])
+        x = objects.Atribuicao(p.lineno(2),p[1],p[3])
     #Só subo o objeto condicional
     else:
         x = p[1]
@@ -392,7 +397,7 @@ def p_condexpr(p):
     x = None   
     #Se é uma expressao condicional
     if len(p) == 6:
-        x = objects.Condicional(p[1],p[3],p[5])
+        x = objects.Condicional(p.lineno(2), p[1], p[3], p[5])
     #Só subo o objeto Ou
     else:
         x = p[1]
@@ -407,7 +412,7 @@ def p_orexpr(p):
     x = None
     #para uma expressao com OU
     if len(p) == 4:
-        x = objects.Ou(p[1],p[3])
+        x = objects.Ou(p.lineno(2),p[1],p[3])
     #Só subo a arvore E
     else:
         x = p[1]    
@@ -422,7 +427,7 @@ def p_andexpr(p):
     x = None
     #para uma expressao com E
     if len(p) == 4:
-        x = objects.E(p[1], p[3])
+        x = objects.E(p.lineno(2),p[1], p[3])
     #Só subo a arvore Equivalencia
     else:
         x = p[1]
@@ -438,10 +443,10 @@ def p_eqexpr(p):
     x = None
     #Expressao de igualdade ==
     if len(p) == 4:
-        x = objects.Equivalente(p[1],p[3],True)
+        x = objects.Equivalente(p.lineno(2), p[1], p[3], True)
     #Expressao de diferente !=
     elif len(p) == 4:
-        x = objects.Equivalente(p[1],p[4],False)
+        x = objects.Equivalente(p.lineno(2),p[1], p[4], False)
     #Só subo a arvore de deseigualdade
     else:
         x = p[1]
@@ -462,16 +467,16 @@ def p_desigexpr(p):
     if len(p) == 4:
         #Se a operação é um >
         if p[2] == ">":
-            x = objects.Desigualdade(p[1],p[3],Maior=True,Igual=False)
+            x = objects.Desigualdade(p.lineno(2),p[1],p[3],Maior=True,Igual=False)
         else:
-            x = objects.Desigualdade(p[1],p[3],Maior=False,Igual=False)
+            x = objects.Desigualdade(p.lineno(2), p[1], p[3], Maior=False, Igual=False)
     #Desigualdade com =
     elif len(p) == 5:
         #Se a operação é um >
         if p[2] == ">":
-            x = objects.Desigualdade(p[1],p[4],Maior=True,Igual=True)
+            x = objects.Desigualdade(p.lineno(2), p[1], p[4], Maior=True, Igual=True)
         else:
-            x = objects.Desigualdade(p[1],p[4],Maior=False,Igual=True)
+            x = objects.Desigualdade(p.lineno(2),p[1],p[4],Maior=False,Igual=True)
     #Só subo a árvore de adição
     else:
         x = p[1]
@@ -489,10 +494,10 @@ def p_addexpr(p):
     if len(p) == 4:
         #Se a operação é de +
         if p[2] == "+":
-           x = objects.Adicao(p[1],p[3],Mais = True) 
+           x = objects.Adicao(p.lineno(2), p[1], p[3], Mais=True)
         #Se a operação é de -
         else:
-            x = objects.Adicao(p[1],p[3],Mais = False)
+            x = objects.Adicao(p.lineno(2), p[1], p[3], Mais=False)
     #Só subo a árvore de multiplicação
     else:
         x = p[1]
@@ -510,13 +515,13 @@ def p_mulexpr(p):
     if len(p) == 4:
         #Se a operação é de Vezes
         if p[2] == "*":
-            x = objects.Multiplicacao(p[1],p[3],Vezes=True)
+            x = objects.Multiplicacao(p.lineno(2), p[1], p[3], Vezes=True)
         #Se a operação é de Divisao
         elif p[2] == "/":
-            x = objects.Multiplicacao(p[1],p[3],Divisao=True)
+            x = objects.Multiplicacao(p.lineno(2), p[1], p[3], Divisao=True)
         #Se a operação é de resto da divisao (%)
         elif p[2] == "%":
-            x = objects.Multiplicacao(p[1], p[3],Resto=True)
+            x = objects.Multiplicacao(p.lineno(2), p[1], p[3], Resto=True)
 
     #Só subo a árvore unitária
     else:
@@ -535,10 +540,10 @@ def p_unexpr(p):
     if len(p) == 3:
         #Se é uma operação de menos
         if p[1] == "-":
-            x = objects.UnaryExpr(isMenos=True)
+            x = objects.UnaryExpr(p.lineno(1), isMenos=True)
         #Se é a negação de uma operação (!)
         elif p[1] == "!":
-            x = objects.UnaryExpr(isNegativo=True)
+            x = objects.UnaryExpr(p.lineno(1),isNegativo=True)
     #Se só devo subir a operação
     else:
         x = p[1]
@@ -554,10 +559,10 @@ def p_lvalueexpr(p):
     x = None
     #Se o identificador acessado é um vetor
     if len(p) == 5:
-        x = objects.Lval(p[1],p[3])
+        x = objects.Lval(p.lineno(1), p[1], p[3])
     #Se o identificador acessado não é um vetor, exp = None no objeto
     else:
-        x = objects.Lval(p[1])
+        x = objects.Lval(p.lineno(1), p[1])
 
     p[0] = x
 def p_primexpr1(p):
@@ -574,20 +579,20 @@ def p_primexpr1(p):
     if len(p) == 5:
         #Se for uma chamada de função
         if p[2] == "(":
-            x = objects.Primexpr(p[1],p[3],isFunction=True)
+            x = objects.Primexpr(p.lineno(1),p[1],p[3],isFunction=True)
         #Se for uma posição de vetor (acesso a vetor)
         else:
-            x = objects.Primexpr(p[1],arvoreAtribuicao=p[3],isVariable=True)
+            x = objects.Primexpr(p.lineno(1),p[1],arvoreAtribuicao=p[3],isVariable=True)
     elif len(p) == 4:
         #Se for uma chamada de função sem parâmetros
         if p[2] == "(":
-            x = objects.Primexpr(p[1],isFunction=True)
+            x = objects.Primexpr(p.lineno(1),p[1],isFunction=True)
         #Se for uma expressao entre parenteses
         else:
-            x = objects.Primexpr(arvoreListExpr=p[2],isExpression=True)
+            x = objects.Primexpr(p.lineno(1),arvoreListExpr=p[2],isExpression=True)
     #Apenas um ID (Variavel ou endereço de vetor)
     else:
-        x = objects.Primexpr(p[1],isVariable=True)
+        x = objects.Primexpr(p.lineno(1), p[1], isVariable=True)
 
     p[0] = x
 
@@ -596,7 +601,7 @@ def p_primexpr2(p):
     primexpr : CARCONST
     """
 
-    x = objects.Primexpr(valorConstante=p[1],isCar=True)
+    x = objects.Primexpr(p.lineno(1), valorConstante=p[1], isCar=True)
     p[0] = x
 
 
@@ -604,7 +609,7 @@ def p_primexpr3(p):
     """
     primexpr : INTCONST
     """
-    x = objects.Primexpr(valorConstante=p[1],isInt=True)
+    x = objects.Primexpr(p.lineno(1),valorConstante=p[1],isInt=True)
     p[0] = x
 
 def p_listexpr(p):
@@ -617,7 +622,7 @@ def p_listexpr(p):
 
     #Se a instancia atual é uma cadeia de expressoes separadas por virgula
     if len(p) == 4:
-        x = objects.ListExpr(p[1],p[3])
+        x = objects.ListExpr(p.lineno(2), p[1], p[3])
     #Se a instancia atual é apenas uma expressao
     else:
         x = p[1]
@@ -643,6 +648,10 @@ parser = yacc.yacc()
 #yacc.parse(open("test.txt","r"))
 
 #parser.parse(s, tracking=True)
-parser.parse(arquivo)
+Tree = parser.parse(arquivo)
+
+objects.walkTreeScopeStart(Tree,None)
+
+print(objects.escopo)
 
 print("Nenhum erro encontrado")
