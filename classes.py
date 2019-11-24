@@ -349,9 +349,9 @@ def createScope(variableDict,parent):
     global escopo
     newScope = Scope(variableDict,parent)
     if parent == None:
-        escopo["global"] = newScope.__dict__
+        escopo["global"] = newScope
     else:
-        escopo[id(newScope)] = newScope.__dict__
+        escopo[id(newScope)] = newScope
     return newScope
 
 ####### Para percorrer a árvore#######
@@ -395,7 +395,6 @@ def walkTreeScopeBloco(Tree,parent,functionVariablesDict = None):
     
     newParent = createScope(localVariables,parent)
 
-    print(id(newParent))
 
     listcomando = Tree.getArvoreListComando()
     

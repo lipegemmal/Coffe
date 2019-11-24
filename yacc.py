@@ -654,4 +654,7 @@ objects.walkTreeScopeStart(Tree,None)
 
 print(objects.escopo)
 
+for x in objects.escopo:
+    print(objects.escopo[x].getVariableDict())
+
 print("Nenhum erro encontrado")
