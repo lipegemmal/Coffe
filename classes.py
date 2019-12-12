@@ -40,49 +40,15 @@ class Funcao(object):
     def setTipo(self,tipo):
         self.tipo = tipo
 
+    def getTipo(self):
+        return self.tipo
+
     def getDictVariable(self):
         return self.dictVariable
     
     def getArvoreBloco(self):
         return self.arvoreBloco
 
-#Não lembro oq é kkk######################
-class BinaryOperation(object):
-    def __init__(self,lineno,operation,left,right):
-        self.operation = operation
-        self.left = left
-        self.right = right
-        self.lineno = lineno
-
-    def getOperation(self):
-        return self.operation
-
-    def getLeft(self):
-        return self.left
-    
-    def getRight(self):
-        return self.right
-
-    def getLineno(self):
-        return self.lineno
-
-class Comparative(object):
-    def __init__(self,lineno,comparative,left,right):
-        self.comparative = comparative
-        self.left = left
-        self.right = right
-        self.lineno = lineno
-
-    def getComparative(self):
-        return self.comparative
-    def getLeft(self):
-        return self.left
-    def getRight(self):
-        return self.right
-
-    def getLineno(self):
-        return self.lineno
-#######################################
 
 class Ou(object):
     def __init__(self,lineno,arvoreOu,arvoreE):
@@ -93,14 +59,26 @@ class Ou(object):
     def getLineno(self):
         return self.lineno
 
+    def getArvoreOu(self):
+        return self.arvoreOu
+    
+    def getArvoreE(self):
+        return self.arvoreE
+
 class E(object):
-    def __init__(self,lineno,arvoreE, arvoreEquivalete):
+    def __init__(self,lineno,arvoreE, arvoreEquivalente):
         self.arvoreE = arvoreE #outro objeto E
-        self.arvoreEquivalete = arvoreEquivalete  # objeto Equivalete
+        self.arvoreEquivalete = arvoreEquivalente  # objeto Equivalete
         self.lineno = lineno
 
     def getLineno(self):
         return self.lineno
+    
+    def getArvoreE(self):
+        return self.arvoreE
+    
+    def getArvoreEquivalente(self):
+        return self.arvoreEquivalente
 
 class Equivalente(object):
     def __init__(self,lineno,arvoreEquivalente,arvoreDesigualdade,equivalencia=True):
@@ -111,6 +89,15 @@ class Equivalente(object):
 
     def getLineno(self):
         return self.lineno
+    
+    def getArvoreEquivalente(self):
+        return self.arvoreEquivalente
+    
+    def getArvoreDesigualdade(self):
+        return self.arvoreDesigualdade
+
+    def getIsEquivalencia(self):
+        return self.equivalencia
 
 class Desigualdade(object):
     def __init__(self,lineno,arvoreDesigualdade,arvoreAdicao,Maior = True,Igual = False):
@@ -122,6 +109,18 @@ class Desigualdade(object):
 
     def getLineno(self):
         return self.lineno
+    
+    def getArvoreDesigualdade(self):
+        return self.arvoreDesigualdade
+    
+    def getArvoreAdicao(self):
+        return self.arvoreAdicao
+    
+    def getIsMaior(self):
+        return self.Maior
+    
+    def getIsIgual(self):
+        return self.Igual
 
 class Adicao(object):
     def __init__(self,lineno,arvoreAdicao,arvoreMultiplicacao,Mais = True):
@@ -132,6 +131,15 @@ class Adicao(object):
 
     def getLineno(self):
         return self.lineno
+    
+    def getArvoreAdicao(self):
+        return self.arvoreAdicao
+    
+    def getArvoreMultiplicacao(self):
+        return self.arvoreMultiplicacao
+    
+    def getIsMais(self):
+        return self.Mais
 
 class Multiplicacao(object):
     def __init__ (self,lineno,arvoreMultiplicacao,arvoreUnitaria,Vezes = False,Divisao = False,Resto = False):
@@ -147,6 +155,21 @@ class Multiplicacao(object):
 
     def getLineno(self):
         return self.lineno
+    
+    def getArvoreMultiplicacao(self):
+        return self.arvoreMultiplicacao
+    
+    def getArvoreUnitaria(self):
+        return self.arvoreUnitaria
+    
+    def getIsVezes(self):
+        return self.Vezes
+    
+    def getIsDivisao(self):
+        return self.Divisao
+    
+    def getIsResto(self):
+        return self.Resto
 
 class Atribuicao(object):
     def __init__ (self,lineno,arvoreLval,arvoreAtribuicao):
@@ -157,6 +180,12 @@ class Atribuicao(object):
     def getLineno(self):
         return self.lineno
 
+    def getArvoreLval(self):
+        return self.arvoreLval
+
+    def getArvoreAtribuicao(self):
+        return self.arvoreAtribuicao
+
 class Condicional(object):
     def __init__ (self,lineno,arvoreOu,arvoreExpressao,arvoreCondicional):
         self.arvoreOu = arvoreOu #objeto Ou
@@ -166,19 +195,34 @@ class Condicional(object):
 
     def getLineno(self):
         return self.lineno
+    
+    def getArvoreOu(self):
+        return self.arvoreOu
+    
+    def getArvoreExpressao(self):
+        return self.arvoreExpressao
+    
+    def getArvoreCondicional(self):
+        return self.arvoreCondicional
 
 class Lval(object):
-    def __init__ (self,lineno,id,expressao = None):
-        self.id = id #identificador da variavel
+    def __init__ (self,lineno,identificador,expressao = None):
+        self.identificador = identificador #identificador da variavel
         self.expressao = expressao #Se expressao é None a variavel não é um vetor
         self.lineno = lineno
+
+    def getId(self):
+        return self.identificador
+    
+    def getExpressao(self):
+        return self.expressao
 
     def getLineno(self):
         return self.lineno
 
 #Arvore com várias expressoes separadas por vírgula
 class ListExpr(object):
-    def __init__ (self,lineno,arvoreListExpr,arvoreAtribuicao):
+    def __init__ (self,lineno,arvoreListExpr=None,arvoreAtribuicao=None):
         self.arvoreListExpr = arvoreListExpr #outro objeto ListExpr
         self.arvoreAtribuicao = arvoreAtribuicao #Objeto Atribuicao
         self.lineno = lineno
@@ -186,7 +230,14 @@ class ListExpr(object):
     def getLineno(self):
         return self.lineno
 
-class Primexpr(object):
+    def getArvoreListExpr(self):
+        return self.arvoreListExpr
+
+    def getArvoreAtribuicao(self):
+        return self.getArvoreAtribuicao
+
+
+class PrimExpr(object):
     def __init__(self,lineno,identificador = None,arvoreListExpr = None,arvoreAtribuicao = None,valorConstante = None, isFunction = False,isVariable = False,isExpression=False,isCar=False,isInt=False):
         self.identificador = identificador
         self.arvoreListExpr = arvoreListExpr
@@ -200,20 +251,61 @@ class Primexpr(object):
         self.lineno = lineno
         #Talvez seja interessante fazer algumas verificações para garantir que tudo foi colocado certinho nesse objeto
 
+
     def getLineno(self):
         return self.lineno
 
+    def getIdentificador(self):
+        return self.identificador
+    
+    def getArvoreListExpr(self):
+        return self.arvoreListExpr
+    
+    def getArvoreAtribuicao(self):
+        return self.arvoreAtribuicao
+    
+    def getValorConstante(self):
+        return self.valorConstante
+
+    def getIsFunction(self):
+        return self.isFunction 
+    
+    def getIsVariable(self):
+        return self.isVariable
+    
+    def getIsExpression(self):
+        return self.isExpression
+    
+    def getIsCar(self):
+        return self.isCar
+
+    def getIsInt(self):
+        return self.isInt
+
 class UnaryExpr(object):
-    def __init__(self,lineno,isNegativo=False,isMenos=False):
+    def __init__(self,lineno,arvorePrimExpr,isNegativo=False,isMenos=False):
         self.isNegativo = isNegativo
         self.isMenos = isMenos
         self.lineno = lineno
+        self.arvorePrimExpr = arvorePrimExpr
         if(isMenos == False and isNegativo == False):
             print("Classe unária sem operacao")
             exit()
 
     def getLineno(self):
         return self.lineno
+
+    def getArvorePrimExpr(self):
+        return self.arvorePrimExpr
+
+    def getIsNegativo(self):
+        return self.isNegativo
+
+    def getIsMenos(self):
+        return self.isMenos
+
+
+    
 
 class ListComando(object):
     def __init__(self,lineno,arvoreComando , arvoreListaComando = None):
@@ -244,7 +336,7 @@ class Se(object):
     def getComando(self):
         return self.comando
     
-    def isSenao(self):
+    def getIsSenao(self):
         return self.senao
     
     def getComandoSenao(self):
@@ -287,14 +379,14 @@ class Escreva(object):
         self.isCadeiaDeCaracteres = isCadeiaDeCaracteres #Caso seja uma cadeia de Caracteres
         self.lineno = lineno
 
-        if isCadeiaDeCaracteres != False and isExpressao != False:
-            print("Operacao de escrever com entrada ambigua")
+        if (isCadeiaDeCaracteres != False and isExpressao != False) or (isCadeiaDeCaracteres == False and isExpressao == False):
+            print("Operacao de escrever com entrada ambigua na linha " + lineno)
             exit()
     def getValue(self):
         return self.value
-    def isExpressao(self):
+    def getIsExpressao(self):
         return self.isExpressao
-    def isCadeiaDeCaracteres(self):
+    def getIsCadeiaDeCaracteres(self):
         return self.isCadeiadeCaracteres
     def getLineno(self):
         return self.lineno
@@ -330,6 +422,12 @@ class Bloco(object):
 
     def getLineno(self):
         return self.lineno
+    
+    def getScopeObj(self):
+        return self.scope
+
+    def setScopeObj(self,scope):
+        self.scope = scope
 
 #classe do escopo de variáveis
 #Para determinar os pais , manter uma lista com o objeto dos filhos subindo e depois quando encontrar o pai, setar o pai nos filhos e limpar a lista
@@ -356,15 +454,14 @@ def createScope(variableDict,parent):
 
 ####### Para percorrer a árvore#######
 
-
+#PARA MONTAR O ESCOPO###
 def walkTreeScopeStart(Tree,parent = None):
     localVariables = {}
     global escopo
-    for x in Tree:
-        if isinstance(Tree[x] , Variable):
-            localVariables[x] = Tree[x]
 
-        elif isinstance(Tree[x], Funcao):    
+    for x in Tree:
+        localVariables[x] = Tree[x]
+        if isinstance(Tree[x], Funcao):    
             walkTreeScopeFunction(Tree[x],"global")
             pass
 
@@ -395,6 +492,7 @@ def walkTreeScopeBloco(Tree,parent,functionVariablesDict = None):
     
     newParent = createScope(localVariables,parent)
 
+    Tree.setScopeObj(newParent)
 
     listcomando = Tree.getArvoreListComando()
     
@@ -445,11 +543,337 @@ def walkTreeScopeComando(Tree,parent):
     
     elif isinstance(Tree, Bloco):
         walkTreeScopeBloco(Tree,parent)
-    pass
+    
+    #é apenas uma expressão
+    else: 
+        pass
+###FIM DAS FUNÇÕES DE MONTAR ESCOPO###
+
+##PARA VERIFICAR TIPOS###
+
+def walkTreeTypeStart(Tree):
+    for x in Tree:
+        if isinstance(Tree[x], Variable):
+           pass
+
+        elif isinstance(Tree[x], Funcao):
+            walkTreeTypeFunction(Tree[x])
+            
+
+  
+def walkTreeTypeFunction(Tree):
+    x = Tree.getArvoreBloco()
+
+    #print("Objeto Escopo :" + str(x.getScopeObj()))
+    if x != None: 
+        walkTreeTypeBloco(x,Tree.getTipo())
+    
+
+def walkTreeTypeBloco(Tree,tipoRetorno):
+    x = Tree.getArvoreListComando()
+    escopoAtual = Tree.getScopeObj()
+
+    if x != None:
+        walkTreeTypeListComando(x,tipoRetorno,escopoAtual)
+    
+
+def walkTreeTypeListComando(Tree,tipoRetorno,escopoAtual):
+    
+    if Tree != None:
+        comando = Tree.getArvoreComando()
+        listComando = Tree.getArvoreListComando()
+
+        if comando != None:
+            walkTreeTypeComando(comando,tipoRetorno,escopoAtual)
+    
+        if listComando != None:
+            walkTreeTypeListComando(listComando,tipoRetorno,escopoAtual)
+    
+def walkTreeTypeComando(Tree,tipoRetorno,escopoAtual):
+
+    if isinstance(Tree, Se):
+        comandoSe = Tree.getComando()
+        comandoSenao = Tree.getComandoSenao()
+        expressao = Tree.getExpressao()
+
+        if comandoSe != None:
+            walkTreeTypeComando(comandoSe,tipoRetorno,escopoAtual)
+        if comandoSenao != None:
+            walkTreeTypeComando(comandoSenao, tipoRetorno,escopoAtual)
+
+        if expressao != None:
+            if walkTreeTypeExpressao(expressao,escopoAtual) != "int":
+                print("Expressao da condicao nao inteira, erro na linha ", + str(expressao.getLineno()) )
+                exit()
+
+    elif isinstance(Tree, Enquanto):
+        comando = Tree.getComando()
+        expressao = Tree.getExpressao()
+
+        if comando != None:
+            walkTreeTypeComando(comando, tipoRetorno,escopoAtual)
+        if expressao != None:
+            if walkTreeTypeExpressao(expressao,escopoAtual) != "int":
+                print("Expressao da condicao nao inteira, erro na linha ", + str(expressao.getLineno()) )
+                exit()
+
+    elif isinstance(Tree, Leia):
+        lval = Tree.getArvoreLvalue()
+        walkTreeTypeLval(lval,escopoAtual)
+        pass
+
+    elif isinstance(Tree, Escreva):
+        #Expressao ou cadeia de caracteres
+        value = Tree.getValue()
+        if Tree.getIsExpressao() == True:
+            if value != None:
+                walkTreeTypeExpressao(value,escopoAtual)
+            pass
+        #Equivalente a Tree.getIsCadeiaDeCaracteres() == True
+        else:
+            #Não precisa verificar
+            pass 
+
+    elif isinstance(Tree, NovaLinha):
+        pass
+
+    elif isinstance(Tree, Retorne):
+        expressao = Tree.getExpressao()
+        if tipoRetorno != walkTreeTypeExpressao(expressao,escopoAtual):
+            print("Tipo Retorno " + tipoRetorno)
+            print("Tipo retornado diferente do enunciado, erro na linha "+ str(Tree.getLineno()) )
+            exit()
+        pass
+
+    elif isinstance(Tree, Bloco):
+        walkTreeTypeBloco(Tree,tipoRetorno)
+
+    #é apenas uma expressão
+    else:
+        walkTreeTypeExpressao(Tree,escopoAtual)
+        pass
+
+def walkTreeTypeExpressao(Tree,escopoAtual):
+    #Essa variavel PRECISA retornar algo diferente de vazio
+    tipoExpressao = None
+
+    if isinstance(Tree, Atribuicao):
+        lval = Tree.getArvoreLval()
+        atribuicao = Tree.getArvoreAtribuicao()
+        tipo1 = walkTreeTypeLval(lval, escopoAtual)
+        tipo2 = walkTreeTypeExpressao(atribuicao,escopoAtual) 
+
+        if tipo1 != tipo2:
+            print("Atribuicao de tipos diferentes, erro linha "+ str(Tree.getLineno()))
+            exit()
+        else:
+            tipoExpressao = tipo1 
+
+    elif isinstance(Tree, Condicional):
+        ou  = Tree.getArvoreOu()
+        expressao = Tree.getArvoreExpressao()
+        condicional = Tree.getArvoreCondicional()
+        tipoOu = walkTreeTypeExpressao(ou,escopoAtual)
+
+        if tipoOu != "int":
+            print("expressao condicional nao inteira, erro linha "+ str(Tree.getLineno()))
+            exit()
+        else:
+            tipoExpressao = "int"
+        
+    elif isinstance(Tree, Ou):
+        ou = Tree.getArvoreOu()
+        e = Tree.getArvoreE()
+        tipo1 = walkTreeTypeExpressao(ou,escopoAtual)
+        tipo2 = walkTreeTypeExpressao(e,escopoAtual)
+
+        if tipo1 != tipo2:
+            print("Comparacao entre tipos diferentes, erro linha "+ str(Tree.getLineno()))
+            exit()
+        else:
+            tipoExpressao = tipo1
+
+    elif isinstance(Tree, E):
+        e = Tree.getArvoreE()
+        equivalente = Tree.getArvoreEquivalente()
+        tipo1 = walkTreeTypeExpressao(e,escopoAtual)
+        tipo2 = walkTreeTypeExpressao(equivalente,escopoAtual)
+
+        if tipo1 != tipo2:
+            print("Comparacao entre tipos diferentes, erro linha " + str(Tree.getLineno()))
+            exit()
+        else:
+            tipoExpressao = tipo1
+    
+    elif isinstance(Tree, Equivalente):
+        equivalente = Tree.getArvoreEquivalente()
+        desigualdade = Tree.getArvoreDesigualdade()
+        tipo1 = walkTreeTypeExpressao(equivalente,escopoAtual)
+        tipo2 = walkTreeTypeExpressao(desigualdade,escopoAtual)
+
+        if tipo1 != tipo2:
+            print("Comparacao entre tipos diferentes, erro linha " + str(Tree.getLineno()))
+            exit()
+        else:
+            tipoExpressao = tipo1
+        
+    
+    elif isinstance(Tree, Desigualdade):
+        desigualdade = Tree.getArvoreDesigualdade()
+        adicao = Tree.getArvoreAdicao()
+        tipo1 = walkTreeTypeExpressao(desigualdade,escopoAtual) 
+        tipo2 = walkTreeTypeExpressao(adicao,escopoAtual)
+
+        if tipo1 != tipo2:
+            print("Comparacao entre tipos diferentes, erro linha " + str(Tree.getLineno()) )
+            exit()
+        else:
+            tipoExpressao = tipo1
+        
+    
+    elif isinstance(Tree, Adicao):
+        adicao = Tree.getArvoreAdicao()
+        multiplicacao = Tree.getArvoreMultiplicacao()
+        tipo1 = walkTreeTypeExpressao(adicao,escopoAtual)
+        tipo2 = walkTreeTypeExpressao(multiplicacao,escopoAtual)
+
+        if tipo1 == "int" and tipo2 == "int":
+            tipoExpressao = tipo1
+        else:
+            print("Adicao com tipo nao inteiro , erro linha " + str(Tree.getLineno()))
+            exit()
+        
+    elif isinstance(Tree, Multiplicacao):
+        multiplicacao = Tree.getArvoreMultiplicacao()
+        unary = Tree.getArvoreUnitaria()
+        tipo1 = walkTreeTypeExpressao(multiplicacao,escopoAtual)
+        tipo2 = walkTreeTypeExpressao(unary,escopoAtual)
+        
+        if tipo1 == "int" and tipo2 == "int":
+            tipoExpressao = tipo1
+        else:
+            print("Produto com tipo nao inteiro , erro linha " + str(Tree.getLineno()) )
+            exit()
+
+    elif isinstance(Tree, UnaryExpr):
+        prim = Tree.getArvorePrimExpr()
+        tipo = walkTreeTypePrimExpr(prim,escopoAtual)
+        
+        if tipo != "int":
+            print("Operacao so aceita inteiro, erro linha " + str(Tree.getLineno()))
+            exit()
+        else:
+            tipoExpressao = tipo
+        
+    elif isinstance(Tree, PrimExpr):
+        tipoExpressao = walkTreeTypePrimExpr(Tree,escopoAtual)
 
 
+    #print("Retornando " + str(tipoExpressao))
+    return tipoExpressao
 
 
+def walkTreeTypeLval(Tree, escopoAtual):
+    expressao = Tree.getExpressao()
+    
+    if expressao != None:
+        tipoExp = walkTreeTypeExpressao(expressao,escopoAtual)
+        if tipoExp != "int":
+            print("Expressao nao inteira, erro linha "+ str(Tree.getLineno()) )
+            exit()
+
+    identificador = Tree.getId()
+
+    tipo = getVarType(identificador,escopoAtual)
+    
+    if tipo == None:
+        print("Variavel "+identificador+"nao declarada, erro na linha "+ str(Tree.getLineno()) )
+        exit()
+
+    return tipo
+
+def walkTreeTypePrimExpr(Tree,escopoAtual):
+    
+    #Se for só uma expressao
+    if Tree.getIsExpression() == True:
+        return walkTreeTypeExpressao(Tree.getArvoreListExpr(),escopoAtual)
+
+    #Se for uma variavel
+    if Tree.getIsVariable() == True:
+        tipo = getVarType(Tree.getIdentificador(),escopoAtual)
+
+        if tipo == None:
+            print("Variavel "+Tree.getIdentificador()+"nao declarada, erro na linha "+ str(Tree.getLineno()) )
+            exit()
+        
+        expressao = Tree.getArvoreListExpr()
+        if expressao != None:
+            walkTreeTypeExpressao(expressao,escopoAtual)
+        
+        return tipo
+
+    #Se for uma constante
+    if Tree.getIsCar() == True:
+        return "car"
+    if Tree.getIsInt() == True:
+        return "int"
+    
+    if Tree.getIsFunction() == True:
+        tipo = getVarType(Tree.getIdentificador(),escopoAtual)
+        if tipo == None:
+            print("Funcao "+Tree.getIdentificador()+" nao declarada, erro na linha "+ str(Tree.getLineno()) )
+            exit()
+        #navegar no listExpressao
+        lexpr = Tree.getArvoreListExpr()
+        if lexpr == None:
+            print("Funcao "+Tree.getIdentificador()+"nao declarando corretamente, erro na linha "+ str(Tree.getLineno()))
+            exit()
+
+        print("FUI CHAMADO!!!!")
+        walkTreeTypeListExpr(lexpr,escopoAtual)
+
+        return tipo
+
+def walkTreeTypeListExpr(Tree,escopoAtual):
+   
+    if isinstance(Tree,ListExpr) == True:
+        assignexpr = Tree.getArvoreAtribuicao()
+        listexpr = Tree.getArvoreListExpr()
+        print("ENTREI "+ str(Tree.getLineno()))
+
+        walkTreeTypeExpressao(assignexpr,escopoAtual)
+
+        if listexpr != None:
+            walkTreeTypeListExpr(listexpr,escopoAtual)
+
+    elif isinstance(Tree, Atribuicao) == True:
+        walkTreeTypeExpressao(Tree,escopoAtual)
 
 
+def getVarType(identificador,escopoAtual):
+    global escopo
+    dicionarioAtual = {}
 
+    #print("Procurando "+identificador+" no escopo "+ str(escopoAtual))
+
+    #se for uma string significa que o escopo é o "global"
+    if isinstance(escopoAtual, str):
+        dicionarioAtual = escopo["global"].getVariableDict()
+        #print(dicionarioAtual)
+        if identificador in dicionarioAtual:
+            return dicionarioAtual[identificador].getTipo()
+        else:
+            return None
+    
+    dicionarioAtual = escopo[id(escopoAtual)].getVariableDict()
+
+    if identificador in dicionarioAtual:
+        return dicionarioAtual[identificador].getTipo()
+    else:
+        return getVarType(identificador,escopo[id(escopoAtual)].getParent()) 
+
+    
+###FIM DA VERIFICAÇÃO DE TIPOS
+
+
+##FIM DE ANDAR NA ÁRVORE###
