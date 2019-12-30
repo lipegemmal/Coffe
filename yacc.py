@@ -579,20 +579,20 @@ def p_primexpr1(p):
     if len(p) == 5:
         #Se for uma chamada de função
         if p[2] == "(":
-            x = objects.Primexpr(p.lineno(1),p[1],p[3],isFunction=True)
+            x = objects.PrimExpr(p.lineno(1),p[1],p[3],isFunction=True)
         #Se for uma posição de vetor (acesso a vetor)
         else:
-            x = objects.Primexpr(p.lineno(1),p[1],arvoreAtribuicao=p[3],isVariable=True)
+            x = objects.PrimExpr(p.lineno(1),p[1],arvoreAtribuicao=p[3],isVariable=True)
     elif len(p) == 4:
         #Se for uma chamada de função sem parâmetros
         if p[2] == "(":
-            x = objects.Primexpr(p.lineno(1),p[1],isFunction=True)
+            x = objects.PrimExpr(p.lineno(1),p[1],isFunction=True)
         #Se for uma expressao entre parenteses
         else:
-            x = objects.Primexpr(p.lineno(1),arvoreListExpr=p[2],isExpression=True)
+            x = objects.PrimExpr(p.lineno(1),arvoreListExpr=p[2],isExpression=True)
     #Apenas um ID (Variavel ou endereço de vetor)
     else:
-        x = objects.Primexpr(p.lineno(1), p[1], isVariable=True)
+        x = objects.PrimExpr(p.lineno(1), p[1], isVariable=True)
 
     p[0] = x
 
@@ -601,7 +601,7 @@ def p_primexpr2(p):
     primexpr : CARCONST
     """
 
-    x = objects.Primexpr(p.lineno(1), valorConstante=p[1], isCar=True)
+    x = objects.PrimExpr(p.lineno(1), valorConstante=p[1], isCar=True)
     p[0] = x
 
 
@@ -609,7 +609,7 @@ def p_primexpr3(p):
     """
     primexpr : INTCONST
     """
-    x = objects.Primexpr(p.lineno(1),valorConstante=p[1],isInt=True)
+    x = objects.PrimExpr(p.lineno(1),valorConstante=p[1],isInt=True)
     p[0] = x
 
 def p_listexpr(p):
